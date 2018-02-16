@@ -19,8 +19,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener {
+import java.util.concurrent.TimeUnit;
 
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener {
+    private DataFetcher fetcher;
     private GoogleMap mMap;
     EditText editText;
 
@@ -28,6 +30,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        fetcher = new DataFetcher();
+
+        fetcher.execute(new DataFetcher.DataRequest("10.0.2.2", 5002));
+        try{
+            String result = fetcher.get(100, TimeUnit.SECONDS);
+            System.out.println(result);
+        }catch (Exception e) {
+            System.out.println("Failed");
+        }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
