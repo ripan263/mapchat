@@ -1,16 +1,17 @@
 package com.example.ripan.map;
 
 import android.location.Location;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -18,6 +19,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+
 
 import java.util.concurrent.TimeUnit;
 
@@ -26,18 +30,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     EditText editText;
 
+    private FusedLocationProviderClient mFusedLocationClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
         fetcher = new DataFetcher();
 
         fetcher.execute(new DataFetcher.DataRequest("10.0.2.2", 5002));
-        try{
+        try {
             String result = fetcher.get(100, TimeUnit.SECONDS);
             System.out.println(result);
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Failed");
         }
 
@@ -46,21 +55,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        editText = (EditText) findViewById(R.id.editText);
+        editText = findViewById(R.id.editText);
         editText.setImeActionLabel("Custom text", KeyEvent.KEYCODE_ENTER);
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                String title = textView.getText().toString();
-                LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                Marker marker = mMap.addMarker(new MarkerOptions().position(curLocation).title(title));
-                textView.setVisibility(View.GONE);
-                marker.showInfoWindow();
+            public boolean onEditorAction(final TextView textView, int i, KeyEvent keyEvent) {
+                final String title = textView.getText().toString();
+
+                // Place pin at current location.
+                RunWithCurrentLocation(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess (Location location) {
+                        if (location != null) {
+                            LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                            Marker marker = mMap.addMarker(new MarkerOptions().position(curLocation).title(title));
+                            textView.setVisibility(View.GONE);
+                            marker.showInfoWindow();
+                        }
+                    }
+                });
+
+
                 return true;
             }
         });
-
     }
+
+    void PanCameraToCurrentLocation() {
+        RunWithCurrentLocation(new OnSuccessListener<Location>() {
+                                   @Override
+                                   public void onSuccess (Location location) {
+                                       if (location != null) {
+                                           LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                                           mMap.animateCamera(CameraUpdateFactory.newLatLng(curLocation));
+                                       }
+                                   }
+                               });
+    }
+
+    // Run a given function with the current location, asynchronously.
+    void RunWithCurrentLocation(final OnSuccessListener<Location> f) {
+        mFusedLocationClient.getLastLocation().
+                addOnSuccessListener(this, f);
+    }
+
 
 
     /**
@@ -80,29 +118,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
-      /*  Location myLocation= googleMap.getMyLocation();
-        LatLng dublin = new LatLng(myLocation.getLatitude(),myLocation.getLongitude());
-        final Marker marker=mMap.addMarker(new MarkerOptions().position(dublin).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(dublin));
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                marker.remove();
-            }
-        },10000);
-*/
 
-
+        PanCameraToCurrentLocation();
     }
-
-    Location location;
 
     @Override
     public void onMyLocationClick(@NonNull Location location) {
         Toast.makeText(this, "Current location:\n" + location.getLatitude() + " , " + location.getLongitude(), Toast.LENGTH_LONG).show();
         editText.setVisibility(View.VISIBLE);
-        this.location = location;
 
+        // Show keyboard
+        editText.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(editText,InputMethodManager.SHOW_IMPLICIT);
+
+        PanCameraToCurrentLocation();
     }
 
     @Override
