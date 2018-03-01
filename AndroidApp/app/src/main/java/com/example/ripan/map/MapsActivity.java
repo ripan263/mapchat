@@ -23,11 +23,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-
-import java.util.concurrent.TimeUnit;
+import java.util.Date;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener {
-    private DataFetcher fetcher;
     private GoogleMap mMap;
     EditText editText;
 
@@ -35,21 +33,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Message message1 = new Message();
+        message1.setMessage("Hello there!");
+        message1.setDate(new Date());
+        message1.setLocation("53.344405, -6.257325");
+
+        Message message2 = new Message();
+
+        message2.setMessage("Hi, how are you?");
+        message2.setDate(new Date());
+        message2.setLocation("53.344411, -6.257430");
+
+        Messages.postMessage(message1);
+        Messages.postMessage(message2);
+
+        Messages.update();
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
-        fetcher = new DataFetcher();
-
-        fetcher.execute(new DataFetcher.DataRequest("10.0.2.2", 5002));
-        try {
-            String result = fetcher.get(100, TimeUnit.SECONDS);
-            System.out.println(result);
-        } catch (Exception e) {
-            System.out.println("Failed");
-        }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
