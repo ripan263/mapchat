@@ -4,7 +4,6 @@ import java.util.*;
 
 public class StringID {
     private static final int length = 24;
-    private static final String characters = "ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvxyz0123456789+_";
 
     public static String randomID() {
         StringBuilder idBuilder = new StringBuilder();
@@ -26,15 +25,8 @@ public class StringID {
             return false;
         }
 
-        for (int i = 0; i < length; i++) {
-            char c = id.charAt(i);
-
-            if (characters.indexOf(c) == -1) {
-                return false;
-            }
-        }
-
-        return true;
+        // Allow alphanumeric chars, or +_.
+        return id.matches("^[a-zA-Z0-9+_]+$");
     }
 
 }
