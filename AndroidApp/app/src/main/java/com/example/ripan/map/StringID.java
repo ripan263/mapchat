@@ -4,6 +4,8 @@ import java.util.*;
 
 public class StringID {
     private static final int length = 24;
+    private static final String characters = "ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvxyz0123456789+_";
+
 
     public static String randomID() {
         StringBuilder idBuilder = new StringBuilder();
