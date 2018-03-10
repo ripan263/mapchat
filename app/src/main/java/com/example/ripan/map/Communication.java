@@ -4,6 +4,7 @@ import android.os.*;
 import android.util.*;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.*;
 import java.util.*;
 import java.util.function.*;
@@ -104,6 +105,7 @@ public class Communication extends AsyncTask<Communication.Request, Void, ArrayL
             identifier = id;
             data = in;
             resultHandler = handler;
+            Log.v("MessagesPutRequest", "Created put request");
         }
 
         public String getRequestString() {
@@ -144,12 +146,14 @@ public class Communication extends AsyncTask<Communication.Request, Void, ArrayL
             String result = resultBuilder.toString();
 
             if (result.equals("{\n  \"resp\": \"Message posting sucessful\"\n}") == false) {
+                Log.e("Communication", "Server did not return correct string. :" + result);
                 requestFailed();
                 return;
             }
         }
 
         public void inform() {
+            Log.v("MessagesPutRequest", "Inform");
             resultHandler.accept(this);
         }
 
@@ -159,6 +163,8 @@ public class Communication extends AsyncTask<Communication.Request, Void, ArrayL
     }
 
     protected ArrayList<Request> doInBackground(Request... requests) {
+        Log.v("Communication", "Started do in background");
+
         ArrayList<Request> processedRequests = new ArrayList<>();
 
         for (Request request : requests) {
@@ -211,14 +217,28 @@ public class Communication extends AsyncTask<Communication.Request, Void, ArrayL
             request.processResponse(responseBuilder.toString());
 
             processedRequests.add(request);
+            Log.v("Communication", "Assuming successful send.");
+
         }
+
+        Log.v("Communication", "Ended do in background");
 
         return processedRequests;
     }
 
+    @Override
     protected void onPostExecute(ArrayList<Request> processedRequests) {
+        Log.v("Communication", "Started onPostExecute.");
+
         for (Request request : processedRequests) {
             request.inform();
         }
+        Log.v("Communication", "Ended onPostExecute.");
+
+    }
+
+    @Override
+    protected void onCancelled(ArrayList<Request> requests) {
+        Log.v("Communication", "Requests canceled");
     }
 }

@@ -1,6 +1,9 @@
 package com.example.ripan.map;
 
+import android.location.Location;
 import android.util.*;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.*;
 import java.util.stream.*;
@@ -8,11 +11,7 @@ import java.util.stream.*;
 import org.json.*;
 
 public class Messages {
-    private static HashMap<String, Message> messages;
-
-    static {
-        messages = new HashMap<>();
-    }
+    private static HashMap<String, Message> messages = new HashMap<>();
 
     public static Map<String, Message> getMessagesByUser(String userID) {
         Map<String, Message> results = messages.entrySet().stream()
@@ -31,53 +30,38 @@ public class Messages {
     }
 
     public static void postMessage(Message message) {
+
         if (message == null) {
             throw new IllegalArgumentException();
         }
 
         //Process message locally:
-        message.setMessageID(getNewUniqueMessageID());
         message.setState(Message.MessageState.UserGenerated);
-
-        message.setUserID(Users.getLocalUserID());
 
         messages.put(message.getMessageID(), message);
 
         Log.v("Messages","Sending message:");
-        Log.v("Messages","MessageID: " + message.getMessageID());
-        Log.v("Messages","Date: " + message.getDate());
-        Log.v("Messages","UserID: " + message.getUserID());
-        Log.v("Messages","Location: " + message.getLocation());
-        Log.v("Messages","Message: " + message.getMessage());
+        message.print();
 
         //Prepare message for server:
-        JSONObject messageObject = new JSONObject();
+        Optional<JSONObject> mObj = message.toJson();
 
-        try{
-            messageObject.put("message_id", message.getMessageID());
-            messageObject.put("user_id", message.getUserID());
-            messageObject.put("message", message.getMessage());
-            messageObject.put("time",message.getDate().getTime());
-            messageObject.put("location",message.getLocation());
-        }catch (JSONException ex) {
-            Log.e("Messages","Failed to build JSON object for message", ex);
-            return;
+        if(mObj.isPresent()) {
+            String identifier = message.getMessageID();
+            String jsonString = mObj.get().toString();
+
+            //Send message to server:
+            Communication communication = new Communication();
+
+            communication.execute(new Communication.MessagesPutRequest(identifier, jsonString, Messages::postedMessage));
         }
-
-        String identifier = message.getMessageID();
-        String jsonString = messageObject.toString();
-
-        //Send message to server:
-        Communication communication = new Communication();
-
-        communication.execute(new Communication.MessagesPutRequest(identifier, jsonString, Messages::postedMessage));
     }
 
     private static void postedMessage(Communication.MessagesPutRequest request) {
-        if (request.wasSuccessful() == false) {
-            Log.e("Messages","Failed to send message");
-        }else{
+        if (request.wasSuccessful()) {
             Log.v("Messages","Successfully sent message");
+        } else {
+            Log.e("Messages","Failed to send message");
         }
 
         Message message = messages.get(request.getIdentifier());
@@ -88,7 +72,7 @@ public class Messages {
 
         if (request.wasSuccessful()) {
             message.setState(Message.MessageState.UserGeneratedSent);
-        }else{
+        } else {
             message.setState(Message.MessageState.UserGeneratedFailedToSend);
         }
     }
@@ -113,7 +97,7 @@ public class Messages {
     }
 
     private static void updated(Communication.MessagesGetRequest request) {
-        if (request.wasSuccessful() == false) {
+        if (!request.wasSuccessful()) {
             Log.e("Messages","Failed to update");
             return;
         }
@@ -128,7 +112,7 @@ public class Messages {
             return;
         }
 
-        if ((result instanceof  JSONArray) == false) {
+        if (!(result instanceof  JSONArray)) {
             Log.e("Messages", "Failed to parse JSON for messages (no array found)");
             return;
         }
@@ -140,64 +124,34 @@ public class Messages {
         int oldMessagesCount = 0;
 
         for (int i = 0; i < messagesArray.length(); i++) {
-            String messageID;
-
-            String userID;
-            String messageString;
-            double dateDouble;
-            String location;
-
+            Optional<Message> m = Optional.empty();
             try {
                 JSONObject messageObject = messagesArray.getJSONObject(i);
-
-                messageID = messageObject.getString("message_id");
-
-                userID = messageObject.getString("user_id");
-                messageString = messageObject.getString("message");
-                dateDouble = messageObject.getDouble("time");
-                location = messageObject.getString("location");
-
-            }catch (JSONException ex) {
-                Log.e("Messages","Failed to parse JSON for message", ex);
-                continue;
+                m = Message.ParseMessage(messageObject);
+            } catch (JSONException ex) {
             }
 
-            if (StringID.isValidID(messageID) == false) {
-                Log.e("Messages","Received invalid messageID");
-                continue;
+            // If message successfully parsed.
+            if (m.isPresent()) {
+                Message message = m.get();
+
+                message.setState(Message.MessageState.Received);
+
+
+                Log.v("Messages","Message received:");
+                message.print();
+
+                if (messages.containsKey(message.getMessageID())) {
+                    oldMessagesCount++;
+                }else{
+                    messages.put(message.getMessageID(), message);
+
+                    newMessagesCount++;
+                }
             }
 
-            if (StringID.isValidID(userID) == false) {
-                Log.e("Messages", "Received invalid userID");
-                continue;
-            }
-
-            long dateLong = (long) dateDouble;
-            Date date = new Date(dateLong);
-
-            Message message = new Message();
-
-            message.setMessageID(messageID);
-            message.setState(Message.MessageState.Received);
-
-            message.setUserID(userID);
-            message.setMessage(messageString);
-            message.setDate(date);
-            message.setLocation(location);
-
-            Log.v("Messages","Message received:");
-            Log.v("Messages","MessageID: " + message.getMessageID());
-            Log.v("Messages","Date: " + message.getDate());
-            Log.v("Messages","UserID: " + message.getUserID());
-            Log.v("Messages","Location: " + message.getLocation());
-            Log.v("Messages","Message: " + message.getMessage());
-
-            if (messages.containsKey(messageID)) {
-                oldMessagesCount++;
-            }else{
-                messages.put(messageID, message);
-
-                newMessagesCount++;
+            else {
+                Log.e("Messages", "Cannot parse json object.");
             }
         }
 

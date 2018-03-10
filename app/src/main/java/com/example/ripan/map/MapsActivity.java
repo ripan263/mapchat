@@ -4,6 +4,7 @@ import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -33,21 +34,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Message message1 = new Message();
-        message1.setMessage("Hello there!");
-        message1.setDate(new Date());
-        message1.setLocation("53.344405, -6.257325");
-
-        Message message2 = new Message();
-
-        message2.setMessage("Hi, how are you?");
-        message2.setDate(new Date());
-        message2.setLocation("53.344411, -6.257430");
-
-        Messages.postMessage(message1);
-        Messages.postMessage(message2);
-
-        Messages.update();
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -61,40 +47,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         editText = findViewById(R.id.editText);
         editText.setImeActionLabel("Custom text", KeyEvent.KEYCODE_ENTER);
-        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(final TextView textView, int i, KeyEvent keyEvent) {
-                final String title = textView.getText().toString();
 
-                // Place pin at current location.
-                RunWithCurrentLocation(new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess (Location location) {
-                        if (location != null) {
-                            LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                            Marker marker = mMap.addMarker(new MarkerOptions().position(curLocation).title(title));
-                            textView.setVisibility(View.GONE);
-                            marker.showInfoWindow();
-                        }
-                    }
-                });
+        editText.setOnEditorActionListener((textView, i, keyEvent) -> {
 
-
+            // Only respond to key up events.
+            if (keyEvent.getAction() != KeyEvent.ACTION_UP)
                 return true;
-            }
+
+            final String title = textView.getText().toString();
+            Log.v("MapsActivity", "OnEditorAction" + keyEvent);
+
+            // Place pin at current location.
+            RunWithCurrentLocation(location -> {
+                if (location != null) {
+                    LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    Marker marker = mMap.addMarker(new MarkerOptions().position(curLocation).title(title));
+                    textView.setVisibility(View.GONE);
+                    marker.showInfoWindow();
+
+
+                    // Create and send message to server.
+                    Log.v("MapsActivity", "Posting message.");
+
+                    Message m = new Message("John Alting", title, curLocation, new Date());
+                    Messages.postMessage(m);
+                    Log.v("MapsActivity", "Posted message.");
+                }
+            });
+
+
+            return true;
         });
     }
 
     void PanCameraToCurrentLocation() {
-        RunWithCurrentLocation(new OnSuccessListener<Location>() {
-                                   @Override
-                                   public void onSuccess (Location location) {
-                                       if (location != null) {
-                                           LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                                           mMap.animateCamera(CameraUpdateFactory.newLatLng(curLocation));
-                                       }
-                                   }
-                               });
+        RunWithCurrentLocation(location -> {
+            if (location != null) {
+                LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(curLocation));
+            }
+        });
     }
 
     // Run a given function with the current location, asynchronously.
@@ -102,7 +94,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mFusedLocationClient.getLastLocation().
                 addOnSuccessListener(this, f);
     }
-
 
 
     /**
