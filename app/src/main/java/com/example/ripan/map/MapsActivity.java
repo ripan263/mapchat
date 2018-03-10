@@ -25,6 +25,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.Date;
+import java.util.function.Consumer;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener {
     private GoogleMap mMap;
@@ -57,28 +58,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             final String title = textView.getText().toString();
             Log.v("MapsActivity", "OnEditorAction" + keyEvent);
 
+            //textView.setVisibility(View.GONE);
+            textView.setText("");
+
             // Place pin at current location.
             RunWithCurrentLocation(location -> {
                 if (location != null) {
+
                     LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                    Marker marker = mMap.addMarker(new MarkerOptions().position(curLocation).title(title));
-                    textView.setVisibility(View.GONE);
-                    marker.showInfoWindow();
 
-
-                    // Create and send message to server.
-                    Log.v("MapsActivity", "Posting message.");
-
-                    Message m = new Message("John Alting", title, curLocation, new Date());
+                    Message m = new Message("TestUsername", title, curLocation, new Date());
+                    // Display on map.
+                    Messages.displayMsgOnMap(m);
                     Messages.postMessage(m);
-                    Log.v("MapsActivity", "Posted message.");
                 }
             });
 
-
             return true;
         });
+
+        Messages.update();
     }
+
+
 
     void PanCameraToCurrentLocation() {
         RunWithCurrentLocation(location -> {
@@ -108,6 +110,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        // Make messages aware of maps..
+        // TODO: Do this better...
+        Messages.mMap = mMap;
+
         // Handler handler= new Handler();
         // Add a marker in Sydney and move the camera
         mMap.setMyLocationEnabled(true);
@@ -141,4 +148,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         return false;
     }
+
 }

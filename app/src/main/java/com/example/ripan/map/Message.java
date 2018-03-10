@@ -75,10 +75,10 @@ public class Message {
             return Optional.empty();
         }
 
-        if (StringID.isValidID(userID) == false) {
-            Log.e("Messages", "Received invalid userID");
-            return Optional.empty();
-        }
+        //if (StringID.isValidID(userID) == false) {
+        //    Log.e("Messages", "Received invalid userID");
+        //    return Optional.empty();
+        //}
 
         long dateLong = (long) dateDouble;
         Date date = new Date(dateLong);

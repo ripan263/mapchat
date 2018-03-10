@@ -3,7 +3,10 @@ package com.example.ripan.map;
 import android.location.Location;
 import android.util.*;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.*;
 import java.util.stream.*;
@@ -12,6 +15,8 @@ import org.json.*;
 
 public class Messages {
     private static HashMap<String, Message> messages = new HashMap<>();
+
+    public static GoogleMap mMap;
 
     public static Map<String, Message> getMessagesByUser(String userID) {
         Map<String, Message> results = messages.entrySet().stream()
@@ -147,6 +152,9 @@ public class Messages {
                     messages.put(message.getMessageID(), message);
 
                     newMessagesCount++;
+
+                    // Update map...
+                    displayMsgOnMap(message);
                 }
             }
 
@@ -159,6 +167,12 @@ public class Messages {
         Log.v("Messages", "Successfully updated:");
         Log.v("Messages", oldMessagesCount + " old message(s)");
         Log.v("Messages", newMessagesCount + " new message(s)");
+    }
+
+    // TODO: This better..
+    public static void displayMsgOnMap(Message m) {
+        Marker marker = mMap.addMarker(new MarkerOptions().position(m.getLocation()).title(m.getUserID() + ": " + m.getMessage()));
+        marker.showInfoWindow();
     }
 
     private static String getNewUniqueMessageID() {
