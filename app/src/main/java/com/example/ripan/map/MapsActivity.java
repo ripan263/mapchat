@@ -158,7 +158,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         markerOptions.title("Current Location");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
 
-        currentLocationMarker = mMap.addMarker(markerOptions);
+        //currentLocationMarker = mMap.addMarker(markerOptions);
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f));
 
