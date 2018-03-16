@@ -13,28 +13,55 @@ import java.util.stream.*;
 
 import org.json.*;
 
-public class Messages {
-    private static HashMap<String, Message> messages = new HashMap<>();
+public class Messages implements Communication.MessagesGetRequest.MessagesGetRequestHandler,
+                                 Communication.MessagesPutRequest.MessagesPutRequestHandler {
+    private static Messages messagesSingleton;
 
-    public static GoogleMap mMap;
+    private HashMap<String, Message> messages;
+    private ArrayList<MessagesObserver> observers;
 
-    public static Map<String, Message> getMessagesByUser(String userID) {
-        Map<String, Message> results = messages.entrySet().stream()
-                .filter(map -> map.getValue().getUserID().equals(userID))
-                .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+    public GoogleMap mMap;
 
-        return results;
+    public static interface MessagesObserver {
+
+        public void updatedMessages(ArrayList<Message> newMesssages);
+
     }
 
-    public static Map<String, Message> getMessagesByLocalUser() {
+    protected static Messages getMessages() {
+        if (messagesSingleton == null) {
+            messagesSingleton = new Messages();
+        }
+
+        return messagesSingleton;
+    }
+
+    private Messages() {
+        messages = new HashMap<>();
+        observers = new ArrayList<>();
+    }
+
+    public ArrayList<Message> getMessagesByUser(String userID) {
+        ArrayList<Message> messagesByUser = new ArrayList<>();
+
+        for (Message message : messages.values()) {
+            if (message.getUserID().equals(userID)) {
+                messagesByUser.add(message);
+            }
+        }
+
+        return messagesByUser;
+    }
+
+    public ArrayList<Message> getMessagesByLocalUser() {
         return getMessagesByUser(Users.getLocalUserID());
     }
 
-    public static Map<String, Message> getAllMessages() {
-        return Collections.unmodifiableMap(messages);
+    public ArrayList<Message> getAllMessages() {
+        return new ArrayList<>(messages.values());
     }
 
-    public static void postMessage(Message message) {
+    public void postMessage(Message message) {
 
         if (message == null) {
             throw new IllegalArgumentException();
@@ -44,6 +71,11 @@ public class Messages {
         message.setState(Message.MessageState.UserGenerated);
 
         messages.put(message.getMessageID(), message);
+
+        ArrayList<Message> newMessages = new ArrayList<>(1);
+        newMessages.add(message);
+
+        informObservers(newMessages);
 
         Log.v("Messages","Sending message:");
         message.print();
@@ -58,11 +90,12 @@ public class Messages {
             //Send message to server:
             Communication communication = new Communication();
 
-            communication.execute(new Communication.MessagesPutRequest(identifier, jsonString, Messages::postedMessage));
+            communication.execute(new Communication.MessagesPutRequest(identifier, jsonString, this));
         }
     }
 
-    private static void postedMessage(Communication.MessagesPutRequest request) {
+    @Override
+    public void handlePutRequestResult(Communication.MessagesPutRequest request) {
         if (request.wasSuccessful()) {
             Log.v("Messages","Successfully sent message");
         } else {
@@ -82,7 +115,7 @@ public class Messages {
         }
     }
 
-    public static void update() {
+    public void update() {
         //Removed timed-out messages:
         HashMap<String, Message> newMessages = new HashMap<>(messages.size());
         Date now = new Date();
@@ -98,10 +131,11 @@ public class Messages {
         //Request messages from server:
         Communication communication = new Communication();
 
-        communication.execute(new Communication.MessagesGetRequest(Messages::updated));
+        communication.execute(new Communication.MessagesGetRequest(this));
     }
 
-    private static void updated(Communication.MessagesGetRequest request) {
+    @Override
+    public void handleGetRequestResult(Communication.MessagesGetRequest request) {
         if (!request.wasSuccessful()) {
             Log.e("Messages","Failed to update");
             return;
@@ -125,15 +159,18 @@ public class Messages {
         JSONArray messagesArray = (JSONArray) result;
 
         //Process messages in JSON array:
+        ArrayList<Message> newMessages = new ArrayList<>();
+
         int newMessagesCount = 0;
         int oldMessagesCount = 0;
 
         for (int i = 0; i < messagesArray.length(); i++) {
-            Optional<Message> m = Optional.empty();
+            Optional<Message> m;
             try {
                 JSONObject messageObject = messagesArray.getJSONObject(i);
                 m = Message.ParseMessage(messageObject);
             } catch (JSONException ex) {
+                continue;
             }
 
             // If message successfully parsed.
@@ -151,6 +188,8 @@ public class Messages {
                 }else{
                     messages.put(message.getMessageID(), message);
 
+                    newMessages.add(message);
+
                     newMessagesCount++;
 
                     // Update map...
@@ -167,15 +206,35 @@ public class Messages {
         Log.v("Messages", "Successfully updated:");
         Log.v("Messages", oldMessagesCount + " old message(s)");
         Log.v("Messages", newMessagesCount + " new message(s)");
+
+        informObservers(newMessages);
+    }
+
+    public void addObserver(MessagesObserver o) {
+        if (o == null ||observers.contains(o)) {
+            return;
+        }
+
+        observers.add(o);
+    }
+
+    public void removeObserver(MessagesObserver o) {
+        observers.remove(o);
+    }
+
+    private void informObservers(ArrayList<Message> newMessages) {
+        for (MessagesObserver observer : observers) {
+            observer.updatedMessages(newMessages);
+        }
     }
 
     // TODO: This better..
-    public static void displayMsgOnMap(Message m) {
+    public void displayMsgOnMap(Message m) {
         Marker marker = mMap.addMarker(new MarkerOptions().position(m.getLocation()).title(m.getUserID() + ": " + m.getMessage()));
         marker.showInfoWindow();
     }
 
-    private static String getNewUniqueMessageID() {
+    private String getNewUniqueMessageID() {
         String messageID = StringID.randomID();
 
         while (messages.containsKey(messageID)) {

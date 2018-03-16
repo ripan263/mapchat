@@ -39,9 +39,13 @@ public class Communication extends AsyncTask<Communication.Request, Void, ArrayL
 
     public static class MessagesGetRequest extends Request {
         private String result;
-        private Consumer<MessagesGetRequest> resultHandler;
+        private MessagesGetRequestHandler resultHandler;
 
-        public MessagesGetRequest(Consumer<MessagesGetRequest> handler) {
+        public static interface  MessagesGetRequestHandler {
+            public void handleGetRequestResult(MessagesGetRequest getRequest);
+        }
+
+        public MessagesGetRequest(MessagesGetRequestHandler handler) {
             if (handler == null) {
                 throw new IllegalArgumentException();
             }
@@ -84,7 +88,7 @@ public class Communication extends AsyncTask<Communication.Request, Void, ArrayL
         }
 
         public void inform() {
-            resultHandler.accept(this);
+            resultHandler.handleGetRequestResult(this);
         }
 
         public String getResult() {
@@ -95,9 +99,13 @@ public class Communication extends AsyncTask<Communication.Request, Void, ArrayL
     public static class MessagesPutRequest extends Request {
         private String identifier;
         private String data;
-        private Consumer<MessagesPutRequest> resultHandler;
+        private MessagesPutRequestHandler resultHandler;
 
-        public MessagesPutRequest(String id, String in, Consumer<MessagesPutRequest> handler) {
+        public static interface  MessagesPutRequestHandler {
+            public void handlePutRequestResult(MessagesPutRequest putRequest);
+        }
+
+        public MessagesPutRequest(String id, String in, MessagesPutRequestHandler handler) {
             if (in == null || handler == null) {
                 throw new IllegalArgumentException();
             }
@@ -154,7 +162,7 @@ public class Communication extends AsyncTask<Communication.Request, Void, ArrayL
 
         public void inform() {
             Log.v("MessagesPutRequest", "Inform");
-            resultHandler.accept(this);
+            resultHandler.handlePutRequestResult(this);
         }
 
         public String getIdentifier() {
