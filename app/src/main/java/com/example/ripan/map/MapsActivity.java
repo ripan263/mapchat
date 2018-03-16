@@ -1,9 +1,14 @@
 package com.example.ripan.map;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -15,14 +20,18 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -66,6 +75,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //showMyAlert("checking permissions now");
             checkLocationPermission();
         }
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            //startActivity(intent);
+            Log.v("Map actibikdcsnxn","fhiifeshik");
+        }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -75,13 +90,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         editText = findViewById(R.id.editText);
         editText.setImeActionLabel("Custom text", KeyEvent.KEYCODE_ENTER);
 
-        editText.setOnEditorActionListener((textView, i, keyEvent) -> {
+        ImageView imageView = (ImageView) findViewById(R.id.imageView);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final String title = editText.getText().toString();
+                //editText.setVisibility(editText.GONE);
+                if (!title.equals("")) {
+                    RunWithCurrentLocation(location -> {
+                        if (location != null) {
+
+                            LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
+
+                            Message m = new Message("TestUsername", title, curLocation, new Date());
+                            // Display on map.
+                            Messages.displayMsgOnMap(m);
+                            Messages.postMessage(m);
+                        }
+                    });
+                    editText.setText("");
+                }
+            }
+        });
+        /*editText.setOnEditorActionListener((textView, i, keyEvent) -> {
 
             // Only respond to key up events.
             if (keyEvent.getAction() != KeyEvent.ACTION_UP)
                 return true;
 
-            final String title = textView.getText().toString();
+            //final String title = textView.getText().toString();
             Log.v("MapsActivity", "OnEditorAction" + keyEvent);
 
             //textView.setVisibility(View.GONE);
@@ -101,7 +138,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             });
 
             return true;
-        });
+        });*/
 
         Messages.update();
     }
@@ -250,7 +287,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .build();
 
         client.connect();
+
     }
+    // permission for state of GPS  and turning it on
+   /* public void turnGPSOn()
+    {
+        Intent intent = new Intent("android.location.GPS_ENABLED_CHANGE");
+        intent.putExtra("enabled", true);
+        this.sendBroadcast(intent);
+
+        String provider = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+        if(!provider.contains("gps")){ //if gps is disabled
+            final Intent poke = new Intent();
+            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+            poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
+            poke.setData(Uri.parse("3"));
+            this.sendBroadcast(poke);
+
+
+        }
+    }
+    // automatic turn off the gps
+    public void turnGPSOff()
+    {
+        String provider = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+        if(provider.contains("gps")){ //if gps is enabled
+            final Intent poke = new Intent();
+            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+            poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
+            poke.setData(Uri.parse("3"));
+            this.sendBroadcast(poke);
+        }
+    }*/
     public boolean checkLocationPermission() {
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -284,4 +352,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
 }
