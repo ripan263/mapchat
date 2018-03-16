@@ -1,9 +1,17 @@
 package com.example.ripan.map;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -48,19 +56,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleApiClient client;
     private LocationRequest locationRequest;
     private Location lastLocation;
-
+    private LocationManager manager;
     private Marker currentLocationMarker;
     EditText editText;
     public static final int REQUEST_LOCATION_CODE = 99;
     private FusedLocationProviderClient mFusedLocationClient;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !manager.isProviderEnabled( LocationManager.NETWORK_PROVIDER ) ){
+            buildAlertMessageNoGps();
+        }
+
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
             //showMyAlert("checking permissions now");
@@ -71,6 +87,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
 
         editText = findViewById(R.id.editText);
         editText.setImeActionLabel("Custom text", KeyEvent.KEYCODE_ENTER);
@@ -119,6 +137,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             buildGoogleApiClient();
                         }
                         mMap.setMyLocationEnabled(true);
+
                     }
                 }
                 else
@@ -196,6 +215,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
         mMap = googleMap;
 
         // Make messages aware of maps..
@@ -205,17 +225,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Handler handler= new Handler();
         // Add a marker in Sydney and move the camera
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-                buildGoogleApiClient();
-                mMap.setMyLocationEnabled(true);
-                mMap.setOnMyLocationButtonClickListener(this);
-                mMap.setOnMyLocationClickListener(this);
+                    buildGoogleApiClient();
+                    mMap.setMyLocationEnabled(true);
+                    mMap.setOnMyLocationButtonClickListener(this);
+                    mMap.setOnMyLocationClickListener(this);
 
-            }
-            else{}
+                }
+                else{}
 
         }
+
         else {
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
@@ -267,6 +288,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         else return true;
 
+    }
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                        System.exit(0);
+                        //this.finishAffinity();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
     @Override
     public boolean onMyLocationButtonClick() {
