@@ -76,7 +76,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
+        InternalFile user_file = new InternalFile();
 
         if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !manager.isProviderEnabled( LocationManager.NETWORK_PROVIDER ) ){
             buildAlertMessageNoGps();
@@ -117,7 +117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
-                            Message m = new Message("TestUsername", title, curLocation, new Date());
+                            Message m = new Message(user_file.getUsername(getApplicationContext()), title, curLocation, new Date());
                             // Display on map.
                             Messages.displayMsgOnMap(m);
                             Messages.postMessage(m);

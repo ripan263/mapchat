@@ -29,13 +29,18 @@
             android:value="AIzaSyD6i0ctaXGSU34dSioNhQc-VOSvHA2A9YM"/>
         <!--android:value="@string/google_maps_key"-->
         <activity
-            android:name=".MapsActivity"
+            android:name=".Login"
             android:label="@string/title_activity_maps">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".MapsActivity" />
+        <activity android:name=".Welcome" />
+        <activity android:name=".Register"
+            android:label="@string/title_activity_login">
         </activity>
     </application>
 
