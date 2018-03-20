@@ -379,7 +379,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         return false;
     }
+    @Override
+    public void onResume(){
+        super.onResume();
+        buildAlertMessageNoGps();
 
+    }
     @Override
     public void onConnectionSuspended(int i) {
 
