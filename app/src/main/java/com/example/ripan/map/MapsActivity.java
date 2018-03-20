@@ -51,6 +51,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 import java.util.function.Consumer;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
@@ -120,7 +121,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
-                            Message m = new Message("TestUsername", title, curLocation, new Date());
+                            // Testing pintype, TODO: Load from ui..
+                            Message.PinType randomType = Message.PinType.values()[new Random().nextInt(Message.PinType.values().length)];
+
+                            Message m = new Message("TestUsername", title, curLocation, new Date(), randomType);
 
                             showMessageOnMap(m);
                             Messages.getInstance().postMessage(m);
@@ -267,7 +271,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     mMap.setOnMyLocationClickListener(this);
                 }
                 else{}
-
         }
 
         else {
@@ -314,7 +317,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void showMessageOnMap(Message m) {
+        // TODO: use pintype.
+        Message.PinType t = m.getPinType();
+
         Marker marker = mMap.addMarker(new MarkerOptions().position(m.getLocation()).title(m.getUserID() + ": " + m.getMessage()));
+
         marker.showInfoWindow();
     }
 
