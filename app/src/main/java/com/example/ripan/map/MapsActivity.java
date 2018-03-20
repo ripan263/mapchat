@@ -49,6 +49,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.function.Consumer;
 
@@ -57,7 +58,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         GoogleMap.OnMyLocationButtonClickListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+        LocationListener,
+        Messages.MessagesObserver
+{
     private GoogleMap mMap;
     private GoogleApiClient client;
     private LocationRequest locationRequest;
@@ -118,15 +121,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
                             Message m = new Message("TestUsername", title, curLocation, new Date());
-                            // Display on map.
-                            Messages.displayMsgOnMap(m);
-                            Messages.postMessage(m);
+
+                            showMessageOnMap(m);
+                            Messages.getInstance().postMessage(m);
                         }
                     });
                     editText.setText("");
                 }
             }
         });
+
+
         /*editText.setOnEditorActionListener((textView, i, keyEvent) -> {
 
             // Only respond to key up events.
@@ -155,7 +160,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return true;
         });*/
 
-        Messages.update();
+        Messages.getInstance().update();
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -241,8 +246,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
@@ -252,12 +255,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap = googleMap;
 
-        // Make messages aware of maps..
-        // TODO: Do this better...
-        Messages.mMap = mMap;
+        // Add listener to messages.
+        Messages.getInstance().addObserver(this);
 
-        // Handler handler= new Handler();
-        // Add a marker in Sydney and move the camera
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
@@ -265,7 +265,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     mMap.setMyLocationEnabled(true);
                     mMap.setOnMyLocationButtonClickListener(this);
                     mMap.setOnMyLocationClickListener(this);
-
                 }
                 else{}
 
@@ -307,6 +306,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         client.connect();
 
     }
+
+    public void acceptNewMessages(ArrayList<Message> messages) {
+        for (Message m : messages) {
+           showMessageOnMap(m);
+        }
+    }
+
+    private void showMessageOnMap(Message m) {
+        Marker marker = mMap.addMarker(new MarkerOptions().position(m.getLocation()).title(m.getUserID() + ": " + m.getMessage()));
+        marker.showInfoWindow();
+    }
+
     // permission for state of GPS  and turning it on
    /* public void turnGPSOn()
     {
