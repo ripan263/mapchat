@@ -37,6 +37,8 @@
         <activity
             android:name=".NavigationDrawer"
             android:label="@string/title_activity_maps"
+            android:configChanges="keyboard|keyboardHidden|uiMode|screenLayout|screenSize"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

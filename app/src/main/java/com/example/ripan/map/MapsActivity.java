@@ -42,6 +42,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -82,15 +83,15 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         //setContentView(R.layout.activity_maps);
 
 
-/*        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !manager.isProviderEnabled( LocationManager.NETWORK_PROVIDER ) ){
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !manager.isProviderEnabled( LocationManager.NETWORK_PROVIDER ) ){
             buildAlertMessageNoGps();
         }
-*/
+
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
             //showMyAlert("checking permissions now");
-            //checkLocationPermission();
+            checkLocationPermission();
         }
         final LocationManager manager = (LocationManager) getContext().getSystemService( Context.LOCATION_SERVICE );
         if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
@@ -98,12 +99,16 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
             //startActivity(intent);
             Log.v("Map actibikdcsnxn","fhiifeshik");
         }
-        //GOES IN JAMES NAVDRAWER TODO
+        //GOES IN JAMES NAVDRAWER
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        //SupportMapFragment mapFragment = (SupportMapFragment) getContext().portFragmentManager()
-        //        .findFragmentById(R.id.map);
-        //mapFragment.getMapAsync(this);
 
+//        SupportMapFragment mapFragment = (SupportMapFragment) getActivity().getSupportFragmentManager()
+  //              .findFragmentById(R.id.map_rfck);
+
+        MapView mapView = view.findViewById(R.id.map_rfck);
+        mapView.onCreate(savedInstanceState);
+        mapView.onResume();
+        mapView.getMapAsync(this);
 
 
         editText = view.findViewById(R.id.editText);
@@ -116,7 +121,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
                 final String title = editText.getText().toString();
                 //editText.setVisibility(editText.GONE);
                 if (!title.equals("")) {
-                    /*RunWithCurrentLocation(location -> {
+                    RunWithCurrentLocation(location -> {
                         if (location != null) {
 
                             LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
@@ -129,7 +134,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
                             showMessageOnMap(m);
                             Messages.getInstance().postMessage(m);
                         }
-                    })*/;
+                    });
                     editText.setText("");
                 }
             }
@@ -168,7 +173,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
 
         return view;
     }
-/*
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         manager = (LocationManager) getContext().getSystemService( Context.LOCATION_SERVICE );
@@ -176,7 +181,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
 
         super.onCreate(savedInstanceState);
 
-    }*/
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch(requestCode)
@@ -240,7 +245,6 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
             LocationServices.FusedLocationApi.removeLocationUpdates(client, this);
         }
     }
- /*
     void PanCameraToCurrentLocation() {
         RunWithCurrentLocation(location -> {
             if (location != null) {
@@ -249,15 +253,14 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
             }
         });
     }
-*/
+
     // Run a given function with the current location, asynchronously.
-  /*
     void RunWithCurrentLocation(final OnSuccessListener<Location> f) {
         if (checkLocationPermission()) {
             mFusedLocationClient.getLastLocation().
                     addOnSuccessListener(getActivity(), f);
         }
-    }*/
+    }
 
 
     /**
@@ -270,6 +273,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
+        Log.e("MapsAct", "onMapready is called");
         mMap = googleMap;
 
         // Add listener to messages.
@@ -293,11 +297,11 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
             mMap.setOnMyLocationClickListener(this);
         }
         // Set the style of the map..
-        if (googleMap.setMapStyle(new MapStyleOptions(
+        googleMap.setMapStyle(new MapStyleOptions(
                 getResources().getString(R.string.map_style)
-        )));
+        ));
 
-        //PanCameraToCurrentLocation();
+        PanCameraToCurrentLocation();
     }
 
     @Override
@@ -310,7 +314,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         InputMethodManager imm = (InputMethodManager) getContext().getSystemService(getContext().INPUT_METHOD_SERVICE);
         imm.showSoftInput(editText,InputMethodManager.SHOW_IMPLICIT);
 
-        //PanCameraToCurrentLocation();
+        PanCameraToCurrentLocation();
     }
     protected synchronized void buildGoogleApiClient() {
         client = new GoogleApiClient.Builder(getContext())
@@ -368,7 +372,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
             getContext().sendBroadcast(poke);
         }
     }*/
-/*
+
     public boolean checkLocationPermission() {
 
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -386,7 +390,6 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         else return true;
 
     }
-    */
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
@@ -410,7 +413,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
     public boolean onMyLocationButtonClick() {
         Toast.makeText(getContext(), "MyLocation button clicked", Toast.LENGTH_SHORT).show();
 
-        return false;
+        return true;
     }
 
     @Override
@@ -426,10 +429,10 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
     @Override
     public void onResume(){
         super.onResume();
-/*        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !manager.isProviderEnabled( LocationManager.NETWORK_PROVIDER ) ){
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !manager.isProviderEnabled( LocationManager.NETWORK_PROVIDER ) ){
             buildAlertMessageNoGps();
         }
-*/
+
     }
 
 }
