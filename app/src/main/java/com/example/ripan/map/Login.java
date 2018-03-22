@@ -61,6 +61,7 @@ public class Login extends AppCompatActivity implements LoaderCallbacks<Cursor> 
     private View mProgressView;
     private View mLoginFormView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -359,5 +360,3 @@ public class Login extends AppCompatActivity implements LoaderCallbacks<Cursor> 
 
     }
 }
-
-

@@ -123,8 +123,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             // Testing pintype, TODO: Load from ui..
                             Message.PinType randomType = Message.PinType.values()[new Random().nextInt(Message.PinType.values().length)];
-
-                            Message m = new Message("TestUsername", title, curLocation, new Date(), randomType);
+                            //Log.e("Map", user_file.getUsername(getApplication().getBaseContext()));
+                            Message m = new Message(user_file.getUsername(getApplication().getBaseContext()), title, curLocation, new Date(), randomType);
 
                             showMessageOnMap(m);
                             Messages.getInstance().postMessage(m);
@@ -405,6 +405,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !manager.isProviderEnabled( LocationManager.NETWORK_PROVIDER ) ){
+            buildAlertMessageNoGps();
+        }
 
     }
 

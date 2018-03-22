@@ -1,6 +1,7 @@
 package com.example.ripan.map;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -16,7 +17,8 @@ import java.io.OutputStreamWriter;
  */
 
 //File Layout for users:
-    //Login, User Name, Password, First Name, Last Name, date of birth, email\n
+    //Login, User Name,First Name, Last Name, date of birth, email\n
+    //Password\n
     //Login: Yes = 1. No = 0
 
 public class InternalFile {
@@ -32,7 +34,7 @@ public class InternalFile {
 
             splitLine = reader.readLine().split(",");
             reader.close();
-            return splitLine[0];
+            return splitLine[1];
         }
         catch (Exception e) { e.printStackTrace(); return null; }
     }
@@ -58,6 +60,23 @@ public class InternalFile {
             e.printStackTrace();
             return 1;
         }
+    }
+
+    public int saveUserInfo (User user, Context activity) {
+        FileOutputStream output;
+        try {
+            output = activity.getApplicationContext().openFileOutput(this.filename, Context.MODE_PRIVATE);
+            BufferedWriter write = new BufferedWriter(new OutputStreamWriter(output));
+            write.write("1," + user.getUserName() + "," +
+                                    user.getFirstName() + "," +
+                                    user.getSurName() + "," +
+                                    user.getDateOfBirth() + "," +
+                                    user.getEmail() + "\n");
+            write.write(user.getPassword() + "\n");
+            write.close();
+            return 0;
+        }
+        catch (Exception e){ Log.e ("InternalFile", e.getMessage()); return 1; }
     }
 
 
