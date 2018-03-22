@@ -21,6 +21,7 @@ public class Message {
     private String message;
     private Date date;
     private LatLng location;
+    private PinType pinType;
 
     public enum MessageState {
         Unknown,
@@ -30,19 +31,28 @@ public class Message {
         UserGeneratedFailedToSend
     }
 
+    public enum PinType {
+        Red,
+        Blue,
+        Green,
+        BoxingGlove,
+        NyanCat
+    }
+
     // Create message with new ID.
-    public Message(String userID, String message, LatLng location, Date date) {
-        this(StringID.randomID(), userID, message, location, date);
+    public Message(String userID, String message, LatLng location, Date date, PinType type) {
+        this(StringID.randomID(), userID, message, location, date, type);
     }
 
 
     // Create message with known ID.
-    private Message(String messageID, String userID, String message, LatLng location, Date date) {
+    private Message(String messageID, String userID, String message, LatLng location, Date date, PinType pinType) {
         this.messageID = messageID;
         this.userID = userID;
         this.message = message;
         this.location = location;
         this.date = date;
+        this.pinType = pinType;
 
         state = MessageState.Unknown;
     }
@@ -53,6 +63,7 @@ public class Message {
 
         String userID;
         String messageString;
+        String typeString;
         double dateDouble;
         double latitude;
         double longitude;
@@ -65,6 +76,7 @@ public class Message {
             dateDouble = messageObject.getDouble("time");
             latitude = messageObject.getDouble("latitude");
             longitude = messageObject.getDouble("longitude");
+            typeString = messageObject.getString("pin_type");
         } catch (JSONException ex) {
             Log.e("Messages","Failed to parse JSON for message", ex);
             return Optional.empty();
@@ -80,11 +92,19 @@ public class Message {
         //    return Optional.empty();
         //}
 
-        long dateLong = (long) dateDouble;
-        Date date = new Date(dateLong);
-        LatLng location = new LatLng(latitude, longitude);
+        try {
+            long dateLong = (long) dateDouble;
+            Date date = new Date(dateLong);
+            LatLng location = new LatLng(latitude, longitude);
 
-        return Optional.of(new Message(messageID, userID, messageString, location, date));
+            PinType type = PinType.valueOf(typeString);
+
+            return Optional.of(new Message(messageID, userID, messageString, location, date, type));
+        }
+        catch (Exception e) {
+            Log.e("Messages", "Invalid or out of date properties for message", e);
+            return Optional.empty();
+        }
     }
 
     public Optional<JSONObject> toJson() {
@@ -98,6 +118,7 @@ public class Message {
 
             messageObject.put("latitude", getLocation().latitude);
             messageObject.put("longitude", getLocation().longitude);
+            messageObject.put("pin_type", getPinType());
 
             return Optional.of(messageObject);
 
@@ -108,12 +129,12 @@ public class Message {
     }
 
     public void print() {
-
         Log.v("Messages","MessageID: " + getMessageID());
         Log.v("Messages","Date: " + getDate());
         Log.v("Messages","UserID: " + getUserID());
         Log.v("Messages","Location: " + getLocation());
         Log.v("Messages","Message: " + getMessage());
+        Log.v("Messages", "PinType: " + getPinType());
     }
 
     public String getMessageID() {
@@ -162,6 +183,10 @@ public class Message {
 
     public void setLocation(LatLng location) {
         this.location = location;
+    }
+
+    public PinType getPinType() {
+        return pinType;
     }
 
 }

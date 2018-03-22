@@ -22,13 +22,11 @@ public class Messages implements Communication.MessagesGetRequest.MessagesGetReq
 
     public GoogleMap mMap;
 
-    public static interface MessagesObserver {
-
-        public void updatedMessages(ArrayList<Message> newMesssages);
-
+    public interface MessagesObserver {
+        void acceptNewMessages(ArrayList<Message> newMessages);
     }
 
-    protected static Messages getMessages() {
+    protected static Messages getInstance() {
         if (messagesSingleton == null) {
             messagesSingleton = new Messages();
         }
@@ -191,9 +189,6 @@ public class Messages implements Communication.MessagesGetRequest.MessagesGetReq
                     newMessages.add(message);
 
                     newMessagesCount++;
-
-                    // Update map...
-                    displayMsgOnMap(message);
                 }
             }
 
@@ -224,14 +219,8 @@ public class Messages implements Communication.MessagesGetRequest.MessagesGetReq
 
     private void informObservers(ArrayList<Message> newMessages) {
         for (MessagesObserver observer : observers) {
-            observer.updatedMessages(newMessages);
+            observer.acceptNewMessages(newMessages);
         }
-    }
-
-    // TODO: This better..
-    public void displayMsgOnMap(Message m) {
-        Marker marker = mMap.addMarker(new MarkerOptions().position(m.getLocation()).title(m.getUserID() + ": " + m.getMessage()));
-        marker.showInfoWindow();
     }
 
     private String getNewUniqueMessageID() {
