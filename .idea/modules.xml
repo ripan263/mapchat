@@ -6,10 +6,10 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://C:\Users\caleb\AndroidStudioProjects\mapchat\app\app.iml" filepath="C:\Users\caleb\AndroidStudioProjects\mapchat\app\app.iml" />
       <module fileurl="file://C:\Users\paddyxvy\AndroidStudioProjects\mapchat\app\app.iml" filepath="C:\Users\paddyxvy\AndroidStudioProjects\mapchat\app\app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mapchat.iml" filepath="$PROJECT_DIR$/mapchat.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mapchat.iml" filepath="$PROJECT_DIR$/mapchat.iml" />
       <module fileurl="file://C:\Users\paddyxvy\AndroidStudioProjects\mapchat\mapchat.iml" filepath="C:\Users\paddyxvy\AndroidStudioProjects\mapchat\mapchat.iml" />
       <module fileurl="file://C:\Users\caleb\AndroidStudioProjects\mapchat\mapchat.iml" filepath="C:\Users\caleb\AndroidStudioProjects\mapchat\mapchat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mapchat.iml" filepath="$PROJECT_DIR$/mapchat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mapchatV2.iml" filepath="$PROJECT_DIR$/mapchatV2.iml" />
     </modules>
   </component>
 </project>
