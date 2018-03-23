@@ -34,8 +34,9 @@
             android:name=".NavigationDrawer"
             android:label="@string/title_activity_navigation_drawer"
             android:theme="@style/AppTheme.NoActionBar"></activity>-->
+
         <activity
-            android:name=".NavigationDrawer"
+            android:name=".Login"
             android:label="@string/title_activity_maps"
             android:configChanges="keyboard|keyboardHidden|uiMode|screenLayout|screenSize"
             android:windowSoftInputMode="adjustResize"
@@ -45,6 +46,15 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".Welcome" />
+        <activity
+            android:name=".NavigationDrawer"
+            android:configChanges="keyboard|keyboardHidden|uiMode|screenLayout|screenSize"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".Register"
+            android:label="@string/title_activity_register">
         </activity>
 
     </application>

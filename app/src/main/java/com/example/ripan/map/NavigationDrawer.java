@@ -24,11 +24,11 @@ public class NavigationDrawer extends AppCompatActivity
         setSupportActionBar(toolbar);*/
 
         //Set the fragment initially
-        /*    MapsActivity fragment = new MapsActivity();
-            android.support.v4.app.FragmentTransaction fragmentTransaction =
-                    getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.fragment_container, fragment);
-            fragmentTransaction.commit();*/
+        MapsActivity fragment = new MapsActivity();
+        android.support.v4.app.FragmentTransaction fragmentTransaction =
+                getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.commit();
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
