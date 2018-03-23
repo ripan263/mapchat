@@ -2,7 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="325dp"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
     tools:context="com.example.ripan.map.Register">
@@ -38,11 +38,13 @@
                 android:id="@+id/email_login_form"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:orientation="vertical">
 
                 <EditText
                     android:id="@+id/firstname"
-                    android:layout_width="match_parent"
+                    android:layout_width="350dp"
                     android:layout_height="45dp"
                     android:layout_gravity="center"
                     android:paddingLeft="10dp"
@@ -54,11 +56,13 @@
                     android:singleLine="true"
                     android:layout_marginTop="60dp"
                     android:layout_marginBottom="10dp"
+                    android:nextFocusUp="@id/email"
+                    android:nextFocusLeft="@id/email"
                     tools:hint="Firstname" />
 
                 <EditText
                     android:id="@+id/surname"
-                    android:layout_width="match_parent"
+                    android:layout_width="350dp"
                     android:layout_height="45dp"
                     android:layout_gravity="center"
                     android:layout_marginBottom="10dp"
@@ -72,7 +76,7 @@
 
                 <EditText
                     android:id="@+id/username"
-                    android:layout_width="match_parent"
+                    android:layout_width="350dp"
                     android:layout_height="45dp"
                     android:layout_marginBottom="10dp"
                     android:background="@drawable/rounded_corner"
@@ -86,10 +90,11 @@
 
                 <EditText
                     android:id="@+id/dateofbirth"
-                    android:layout_width="match_parent"
+                    android:layout_width="350dp"
                     android:layout_height="45dp"
                     android:layout_marginBottom="10dp"
                     android:background="@drawable/rounded_corner"
+                    android:layout_gravity="center"
                     android:hint="Date of birth"
                     android:textStyle="bold"
                     android:paddingLeft="10dp"
@@ -99,10 +104,11 @@
 
                 <EditText
                     android:id="@+id/email"
-                    android:layout_width="match_parent"
+                    android:layout_width="350dp"
                     android:layout_height="45dp"
                     android:layout_marginBottom="10dp"
                     android:background="@drawable/rounded_corner"
+                    android:layout_gravity="center"
                     android:hint="@string/prompt_email"
                     android:textStyle="bold"
                     android:paddingLeft="10dp"
@@ -112,9 +118,10 @@
 
                 <EditText
                     android:id="@+id/password"
-                    android:layout_width="match_parent"
+                    android:layout_width="350dp"
                     android:layout_height="45dp"
                     android:background="@drawable/rounded_corner"
+                    android:layout_gravity="center"
                     android:hint="@string/prompt_password"
                     android:imeActionId="6"
                     android:textStyle="bold"

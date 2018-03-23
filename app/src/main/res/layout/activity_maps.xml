@@ -17,6 +17,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:paddingBottom="5dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:background="#ffffff"
         android:gravity="center_vertical|center_horizontal">
 
@@ -27,6 +29,8 @@
             android:layout_gravity="bottom"
             android:background="#ffffff"
             android:hint="Enter your message here"
+            android:nextFocusUp="@id/email"
+            android:nextFocusLeft="@id/email"
             android:textSize="24sp" />
 
         <android.support.v7.widget.AppCompatImageView

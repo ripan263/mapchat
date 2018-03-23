@@ -12,6 +12,8 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         tools:context="com.example.ripan.map.LoginActivity">
         <!-- Login progress -->
         <ProgressBar android:id="@+id/login_progress"
@@ -41,9 +43,11 @@
                         android:inputType="textEmailAddress"
                         android:maxLines="1"
                         android:singleLine="true"
-                        android:layout_marginTop="240dp"
+                        android:layout_marginTop="250dp"
                         android:layout_marginBottom="10dp"
                         android:textStyle="bold"
+                        android:nextFocusUp="@id/email"
+                        android:nextFocusLeft="@id/email"
                         android:paddingLeft="10dp"
                         android:hint="Email"/>
 
@@ -73,14 +77,16 @@
                     android:text="@string/action_sign_in" />
                 <TextView
                     android:id="@+id/register_here"
-                    android:layout_width="100dp"
-                    android:layout_height="25dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
                     android:layout_marginTop="10dp"
                     android:background="@drawable/rounded_corner"
                     android:textColor="@color/textColor"
                     android:text="Register Here"
+                    android:textAlignment="center"
                     android:textStyle="bold"
-                    android:paddingLeft="5dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     android:layout_gravity="center"
                     android:onClick="goToRegister"
                     android:clickable="true"/>
