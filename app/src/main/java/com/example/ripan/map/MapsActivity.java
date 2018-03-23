@@ -127,7 +127,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             Message m = new Message("TestUsername", title, curLocation, new Date(), randomType);
 
                             showMessageOnMap(m);
-                            Messages.getInstance().postMessage(m);
+                            Messages.postMessage(m);
                         }
                     });
                     editText.setText("");
@@ -164,7 +164,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return true;
         });*/
 
-        Messages.getInstance().update();
+        Messages.update();
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -260,7 +260,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add listener to messages.
-        Messages.getInstance().addObserver(this);
+        Messages.addObserver(this);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
