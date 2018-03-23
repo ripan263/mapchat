@@ -81,7 +81,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_maps, container, false);
         //setContentView(R.layout.activity_maps);
-
+        InternalFile user_file = new InternalFile();
 
         if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !manager.isProviderEnabled( LocationManager.NETWORK_PROVIDER ) ){
             buildAlertMessageNoGps();
@@ -129,7 +129,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
                             // Testing pintype, TODO: Load from ui..
                             Message.PinType randomType = Message.PinType.values()[new Random().nextInt(Message.PinType.values().length)];
                             //Log.e("Map", user_file.getUsername(getApplication().getBaseContext()));
-                            Message m = new Message(user_file.getUsername(getApplication().getBaseContext()), title, curLocation, new Date(), randomType);
+                            Message m = new Message(user_file.getUsername(getContext()), title, curLocation, new Date(), randomType);
 
                             showMessageOnMap(m);
                             Messages.postMessage(m);

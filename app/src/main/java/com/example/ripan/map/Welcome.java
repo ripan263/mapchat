@@ -12,22 +12,30 @@ import android.widget.TextView;
 
 public class Welcome extends AppCompatActivity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
-    }
 
-
-    public void goToMap (View view){
-        Intent intent = new Intent(this, MapsActivity.class);
         InternalFile user_file = new InternalFile();
         TextView userfill = (TextView)findViewById(R.id.username);
 
         //Use check for future features...
-        int check = user_file.saveUsername(userfill.getText().toString(), this);
-
-        startActivity(intent);
+        String check = user_file.checkLogin(this);
+        if (check == "1") {
+            Intent intent = new Intent(this, NavigationDrawer.class);
+            startActivity(intent);
+        }
+        else {
+            Intent intent = new Intent(this, Login.class);
+            startActivity(intent);
+        }
         finish();
+    }
+
+
+    public void goToMap (View view){
+
     }
 }

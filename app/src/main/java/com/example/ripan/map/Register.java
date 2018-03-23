@@ -39,7 +39,7 @@ public class Register extends AppCompatActivity {
         email_sign_in_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent goToMainIntent = new Intent(Register.this, MapsActivity.class);
+                Intent goToMainIntent = new Intent(Register.this, NavigationDrawer.class);
                 saveDetails();
                 Register.this.startActivity(goToMainIntent);
                 finish();

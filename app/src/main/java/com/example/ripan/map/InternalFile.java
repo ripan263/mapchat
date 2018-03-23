@@ -79,5 +79,19 @@ public class InternalFile {
         catch (Exception e){ Log.e ("InternalFile", e.getMessage()); return 1; }
     }
 
+    public String checkLogin (Context activity) {
+        FileInputStream input;
+        String line[];
+        try {
+            input = activity.getApplicationContext().openFileInput(this.filename);
+            BufferedReader read = new BufferedReader(new InputStreamReader(input));
+            line = read.readLine().split(",");
+            read.close();
+            return line[0];
+        }
+        catch (Exception e) { Log.e ("Internal File", e.getMessage()); return "0"; }
+
+    }
+
 
 }
