@@ -132,7 +132,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
                             Message m = new Message("TestUsername", title, curLocation, new Date(), randomType);
 
                             showMessageOnMap(m);
-                            Messages.getInstance().postMessage(m);
+                            Messages.postMessage(m);
                         }
                     });
                     editText.setText("");
@@ -169,7 +169,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
             return true;
         });*/
 
-        Messages.getInstance().update();
+        Messages.update();
 
         return view;
     }
@@ -180,7 +180,6 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
 
         super.onCreate(savedInstanceState);
-
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -277,7 +276,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         mMap = googleMap;
 
         // Add listener to messages.
-        Messages.getInstance().addObserver(this);
+        Messages.addObserver(this);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
