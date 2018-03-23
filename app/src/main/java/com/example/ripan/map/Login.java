@@ -297,8 +297,8 @@ public class Login extends AppCompatActivity implements LoaderCallbacks<Cursor> 
     }
 
     public void goToMap(View view) {
-        Intent MapPage = new Intent(this, MapsActivity.class);
-        startActivity(MapPage);
+        Intent NavigationDrawer = new Intent(this, NavigationDrawer.class);
+        startActivity(NavigationDrawer);
         finish();
     }
     /**

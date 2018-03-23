@@ -6,15 +6,19 @@
     android:layout_height="match_parent"
     tools:context="com.example.ripan.map.Login">
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center_horizontal"
+        android:gravity="center"
         android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         tools:context="com.example.ripan.map.LoginActivity">
         <!-- Login progress -->
         <ProgressBar android:id="@+id/login_progress"
             style="?android:attr/progressBarStyleLarge"
+            android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -22,7 +26,8 @@
         <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/textColor">
             <LinearLayout
                 android:id="@+id/email_login_form"
                 android:layout_width="match_parent"
@@ -30,27 +35,42 @@
                 android:orientation="vertical">
                 <AutoCompleteTextView
                         android:id="@+id/email"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_width="325dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/rounded_corner"
+                        android:textColor="@color/textColor"
                         android:inputType="textEmailAddress"
                         android:maxLines="1"
                         android:singleLine="true"
-                        android:layout_marginTop="110dp"
+                        android:layout_marginTop="250dp"
+                        android:layout_marginBottom="10dp"
+                        android:textStyle="bold"
+                        android:nextFocusUp="@id/email"
+                        android:nextFocusLeft="@id/email"
+                        android:paddingLeft="10dp"
                         android:hint="Email"/>
 
                 <EditText
                         android:id="@+id/password"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_width="325dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/rounded_corner"
                         android:inputType="textPassword"
                         android:maxLines="1"
                         android:singleLine="true"
+                        android:textStyle="bold"
+                        android:paddingLeft="10dp"
                         android:hint="Password" />
 
                 <Button
                     android:id="@+id/email_sign_in_button"
                     style="?android:textAppearanceSmall"
-                    android:layout_width="match_parent"
+                    android:layout_width="200dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/rounded_corner"
+                    android:textColor="@color/textColor"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:textStyle="bold"
@@ -58,8 +78,15 @@
                 <TextView
                     android:id="@+id/register_here"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/rounded_corner"
+                    android:textColor="@color/textColor"
                     android:text="Register Here"
+                    android:textAlignment="center"
+                    android:textStyle="bold"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     android:layout_gravity="center"
                     android:onClick="goToRegister"
                     android:clickable="true"/>
