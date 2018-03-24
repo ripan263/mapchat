@@ -64,14 +64,13 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener,
         GoogleMap.OnMarkerClickListener,
-        Messages.MessagesObserver
-{
+        Messages.MessagesObserver {
     private GoogleMap mMap;
     private GoogleApiClient client;
     private LocationRequest locationRequest;
     private Location lastLocation;
     private LocationManager manager;
-    private Marker currentLocationMarker,marker;
+    private Marker currentLocationMarker, marker;
     EditText editText;
     public static final int REQUEST_LOCATION_CODE = 99;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -83,27 +82,26 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         //setContentView(R.layout.activity_maps);
         InternalFile user_file = new InternalFile();
 
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !manager.isProviderEnabled( LocationManager.NETWORK_PROVIDER ) ){
+     /*   if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER) && !manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             buildAlertMessageNoGps();
         }
+*/
 
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             //showMyAlert("checking permissions now");
             checkLocationPermission();
         }
-        final LocationManager manager = (LocationManager) getContext().getSystemService( Context.LOCATION_SERVICE );
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+        final LocationManager manager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
             //startActivity(intent);
-            Log.v("Map actibikdcsnxn","fhiifeshik");
+            Log.v("Map actibikdcsnxn", "fhiifeshik");
         }
         //GOES IN JAMES NAVDRAWER
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
 
 //        SupportMapFragment mapFragment = (SupportMapFragment) getActivity().getSupportFragmentManager()
-  //              .findFragmentById(R.id.map_rfck);
+        //              .findFragmentById(R.id.map_rfck);
 
         MapView mapView = view.findViewById(R.id.map_rfck);
         mapView.onCreate(savedInstanceState);
@@ -112,7 +110,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
 
 
         editText = view.findViewById(R.id.editText);
-        editText.setImeActionLabel("Custom text", KeyEvent.KEYCODE_ENTER);
+        //editText.setImeActionLabel("Custom text", KeyEvent.KEYCODE_ENTER);
 
         ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
         imageView.setOnClickListener(new View.OnClickListener() {
@@ -146,34 +144,30 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        manager = (LocationManager) getContext().getSystemService( Context.LOCATION_SERVICE );
+        manager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
 
         super.onCreate(savedInstanceState);
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch(requestCode)
-        {
+        switch (requestCode) {
             case REQUEST_LOCATION_CODE:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
-                    if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-                    {
-                        if(client ==null)
-                        {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        if (client == null) {
                             buildGoogleApiClient();
                         }
                         mMap.setMyLocationEnabled(true);
 
                     }
-                }
-                else
-                {
+                } else {
                     Toast.makeText(getContext(), "Permission Denied", Toast.LENGTH_LONG).show();
                 }
         }
     }
+
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         locationRequest = new LocationRequest();
@@ -182,11 +176,11 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         locationRequest.setFastestInterval(100);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
-        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-        {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, this);
         }
     }
+
     @Override
     public void onLocationChanged(Location location) {
         double latitude = location.getLatitude();
@@ -194,13 +188,12 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
 
         lastLocation = location;
 
-        if(currentLocationMarker != null)
-        {
+        if (currentLocationMarker != null) {
             currentLocationMarker.remove();
         }
-        Log.d("lat = ",""+latitude);
+        Log.d("lat = ", "" + latitude);
         LatLng latLng = new LatLng(latitude, longitude);
-        MarkerOptions markerOptions =new MarkerOptions();
+        MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title("Current Location");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
@@ -210,10 +203,11 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f));
 
 
-        if(client != null) {
+        if (client != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(client, this);
         }
     }
+
     void PanCameraToCurrentLocation() {
         RunWithCurrentLocation(location -> {
             if (location != null) {
@@ -248,18 +242,16 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         // Add listener to messages.
         Messages.addObserver(this);
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-                    buildGoogleApiClient();
-                    mMap.setMyLocationEnabled(true);
-                    mMap.setOnMyLocationButtonClickListener(this);
-                   // mMap.setOnMyLocationClickListener(this);
-                }
-                else{}
-        }
-
-        else {
+                buildGoogleApiClient();
+                mMap.setMyLocationEnabled(true);
+                mMap.setOnMyLocationButtonClickListener(this);
+                // mMap.setOnMyLocationClickListener(this);
+            } else {
+            }
+        } else {
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
             mMap.setOnMyLocationButtonClickListener(this);
@@ -272,6 +264,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
 
         PanCameraToCurrentLocation();
     }
+
     /*
 
     @Override
@@ -299,7 +292,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
 
     public void acceptNewMessages(ArrayList<Message> messages) {
         for (Message m : messages) {
-           showMessageOnMap(m);
+            showMessageOnMap(m);
         }
     }
 
@@ -307,10 +300,9 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         // TODO: use pintype.
         Message.PinType t = m.getPinType();
 
-        MarkerOptions markerOptions =new MarkerOptions().position(m.getLocation()).title(m.getUserID()).snippet(m.getMessage());
+        MarkerOptions markerOptions = new MarkerOptions().position(m.getLocation()).title(m.getUserID()).snippet(m.getMessage());
         //Marker marker;
-        switch (t)
-        {
+        switch (t) {
             case Red:
                 markerOptions = new MarkerOptions().position(m.getLocation())
                         .title(m.getUserID()).snippet(m.getMessage())
@@ -359,7 +351,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         marker = mMap.addMarker(markerOptions);
         mMap.setOnMarkerClickListener(this);
 
-       // marker.showInfoWindow();
+        // marker.showInfoWindow();
     }
 
 
@@ -367,19 +359,17 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
 
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)){
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
 
                 ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_CODE);
-            }
-            else
-            {
+            } else {
                 ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_CODE);
             }
             return false;
-        }
-        else return true;
+        } else return true;
 
     }
+
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
@@ -399,6 +389,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         final AlertDialog alert = builder.create();
         alert.show();
     }
+
     @Override
     public boolean onMyLocationButtonClick() {
         Toast.makeText(getContext(), "MyLocation button clicked", Toast.LENGTH_SHORT).show();
@@ -418,9 +409,11 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !manager.isProviderEnabled( LocationManager.NETWORK_PROVIDER ) ){
+       // if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+         //   Log.i("ON RESUME","BC on tah hai");
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER) && !manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             buildAlertMessageNoGps();
         }
 
