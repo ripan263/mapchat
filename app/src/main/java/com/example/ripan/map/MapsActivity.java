@@ -56,7 +56,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
-import java.util.function.Consumer;
 
 public class MapsActivity extends Fragment implements OnMapReadyCallback,
         GoogleMap.OnMyLocationButtonClickListener,
@@ -80,7 +79,6 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_maps, container, false);
         //setContentView(R.layout.activity_maps);
-        InternalFile user_file = new InternalFile();
 
      /*   if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER) && !manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             buildAlertMessageNoGps();
@@ -112,6 +110,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         editText = view.findViewById(R.id.editText);
         //editText.setImeActionLabel("Custom text", KeyEvent.KEYCODE_ENTER);
 
+        final InternalFile user_file = new InternalFile();
+
         ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,18 +119,22 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
                 final String title = editText.getText().toString();
                 //editText.setVisibility(editText.GONE);
                 if (!title.equals("")) {
-                    RunWithCurrentLocation(location -> {
-                        if (location != null) {
+                    RunWithCurrentLocation(new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location != null) {
 
-                            LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                                LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
-                            // Testing pintype, TODO: Load from ui..
-                            Message.PinType randomType = Message.PinType.values()[new Random().nextInt(Message.PinType.values().length)];
-                            //Log.e("Map", user_file.getUsername(getApplication().getBaseContext()));
-                            Message m = new Message(user_file.getUsername(getContext()), title, curLocation, new Date(), randomType);
+                                // Testing pintype, TODO: Load from ui..
+                                Message.PinType randomType = Message.PinType.values()[new Random().nextInt(Message.PinType.values().length)];
+                                //Log.e("Map", user_file.getUsername(getApplication().getBaseContext()));
+                                //Message m = new Message(user_file.getUsername(getApplication().getBaseContext()), title, curLocation, new Date(), randomType);
+                                Message m = new Message("Blah", title, curLocation, new Date(), randomType);
 
-                            showMessageOnMap(m);
-                            Messages.postMessage(m);
+                                showMessageOnMap(m);
+                                Messages.postMessage(m);
+                            }
                         }
                     });
                     editText.setText("");
@@ -209,10 +213,13 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
     }
 
     void PanCameraToCurrentLocation() {
-        RunWithCurrentLocation(location -> {
-            if (location != null) {
-                LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                mMap.animateCamera(CameraUpdateFactory.newLatLng(curLocation));
+        RunWithCurrentLocation(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(curLocation));
+                }
             }
         });
     }

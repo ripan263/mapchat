@@ -120,7 +120,7 @@ public class Messages {
 
             if(mObj.isPresent()) {
                 String identifier = message.getMessageID();
-                String jsonString = mObj.get().toString();
+                String jsonString = mObj.value().toString();
 
                 //Send message to server:
                 Communication communication = new Communication();
@@ -198,7 +198,7 @@ public class Messages {
 
                 // If message successfully parsed.
                 if (m.isPresent()) {
-                    Message message = m.get();
+                    Message message = m.value();
 
                     message.setState(Message.MessageState.Received);
 
