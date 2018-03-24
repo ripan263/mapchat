@@ -59,11 +59,11 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 public class MapsActivity extends Fragment implements OnMapReadyCallback,
-        GoogleMap.OnMyLocationClickListener,
         GoogleMap.OnMyLocationButtonClickListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener,
+        GoogleMap.OnMarkerClickListener,
         Messages.MessagesObserver
 {
     private GoogleMap mMap;
@@ -71,7 +71,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
     private LocationRequest locationRequest;
     private Location lastLocation;
     private LocationManager manager;
-    private Marker currentLocationMarker;
+    private Marker currentLocationMarker,marker;
     EditText editText;
     public static final int REQUEST_LOCATION_CODE = 99;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -139,36 +139,6 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
                 }
             }
         });
-
-
-        /*editText.setOnEditorActionListener((textView, i, keyEvent) -> {
-
-            // Only respond to key up events.
-            if (keyEvent.getAction() != KeyEvent.ACTION_UP)
-                return true;
-
-            //final String title = textView.getText().toString();
-            Log.v("MapsActivity", "OnEditorAction" + keyEvent);
-
-            //textView.setVisibility(View.GONE);
-            textView.setText("");
-
-            // Place pin at current location.
-            RunWithCurrentLocation(location -> {
-                if (location != null) {
-
-                    LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
-
-                    Message m = new Message("TestUsername", title, curLocation, new Date());
-                    // Display on map.
-                    Messages.displayMsgOnMap(m);
-                    Messages.postMessage(m);
-                }
-            });
-
-            return true;
-        });*/
-
         Messages.update();
 
         return view;
@@ -208,8 +178,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
     public void onConnected(@Nullable Bundle bundle) {
         locationRequest = new LocationRequest();
 
-        locationRequest.setInterval(1000);
-        locationRequest.setFastestInterval(1000);
+        locationRequest.setInterval(100);
+        locationRequest.setFastestInterval(100);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
         if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
@@ -284,7 +254,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
                     buildGoogleApiClient();
                     mMap.setMyLocationEnabled(true);
                     mMap.setOnMyLocationButtonClickListener(this);
-                    mMap.setOnMyLocationClickListener(this);
+                   // mMap.setOnMyLocationClickListener(this);
                 }
                 else{}
         }
@@ -293,7 +263,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
             mMap.setOnMyLocationButtonClickListener(this);
-            mMap.setOnMyLocationClickListener(this);
+            //mMap.setOnMyLocationClickListener(this);
         }
         // Set the style of the map..
         googleMap.setMapStyle(new MapStyleOptions(
@@ -302,6 +272,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
 
         PanCameraToCurrentLocation();
     }
+    /*
 
     @Override
     public void onMyLocationClick(@NonNull Location location) {
@@ -314,7 +285,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         imm.showSoftInput(editText,InputMethodManager.SHOW_IMPLICIT);
 
         PanCameraToCurrentLocation();
-    }
+    }*/
     protected synchronized void buildGoogleApiClient() {
         client = new GoogleApiClient.Builder(getContext())
                 .addConnectionCallbacks(this)
@@ -336,41 +307,61 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         // TODO: use pintype.
         Message.PinType t = m.getPinType();
 
-        Marker marker = mMap.addMarker(new MarkerOptions().position(m.getLocation()).title(m.getUserID() + ": " + m.getMessage()));
+        MarkerOptions markerOptions =new MarkerOptions().position(m.getLocation()).title(m.getUserID()).snippet(m.getMessage());
+        //Marker marker;
+        switch (t)
+        {
+            case Red:
+                markerOptions = new MarkerOptions().position(m.getLocation())
+                        .title(m.getUserID()).snippet(m.getMessage())
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                break;
 
-        marker.showInfoWindow();
-    }
+            case Blue:
+                markerOptions = new MarkerOptions().position(m.getLocation())
+                        .title(m.getUserID()).snippet(m.getMessage())
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                break;
 
-    // permission for state of GPS  and turning it on
-   /* public void turnGPSOn()
-    {
-        Intent intent = new Intent("android.location.GPS_ENABLED_CHANGE");
-        intent.putExtra("enabled", true);
-        getContext().sendBroadcast(intent);
+            case Green:
+                markerOptions = new MarkerOptions().position(m.getLocation())
+                        .title(m.getUserID()).snippet(m.getMessage())
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                break;
 
-        String provider = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
-        if(!provider.contains("gps")){ //if gps is disabled
-            final Intent poke = new Intent();
-            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
-            poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
-            poke.setData(Uri.parse("3"));
-            getContext().sendBroadcast(poke);
+            case NyanCat:
+                markerOptions = new MarkerOptions().position(m.getLocation())
+                        .title(m.getUserID()).snippet(m.getMessage())
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.nyancat));
+                break;
 
+            case BoxingGlove:
+                markerOptions = new MarkerOptions().position(m.getLocation())
+                        .title(m.getUserID()).snippet(m.getMessage())
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.boxingglove));
+                break;
+
+            case Orange:
+                markerOptions = new MarkerOptions().position(m.getLocation())
+                        .title(m.getUserID()).snippet(m.getMessage())
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+                break;
+
+            case Swords:
+                markerOptions = new MarkerOptions().position(m.getLocation())
+                        .title(m.getUserID()).snippet(m.getMessage())
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.swords));
+                break;
+
+            default:
 
         }
+        marker = mMap.addMarker(markerOptions);
+        mMap.setOnMarkerClickListener(this);
+
+       // marker.showInfoWindow();
     }
-    // automatic turn off the gps
-    public void turnGPSOff()
-    {
-        String provider = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
-        if(provider.contains("gps")){ //if gps is enabled
-            final Intent poke = new Intent();
-            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
-            poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
-            poke.setData(Uri.parse("3"));
-            getContext().sendBroadcast(poke);
-        }
-    }*/
+
 
     public boolean checkLocationPermission() {
 
@@ -411,6 +402,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
     @Override
     public boolean onMyLocationButtonClick() {
         Toast.makeText(getContext(), "MyLocation button clicked", Toast.LENGTH_SHORT).show();
+        PanCameraToCurrentLocation();
 
         return true;
     }
@@ -434,4 +426,9 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
 
     }
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        marker.showInfoWindow();
+        return true;
+    }
 }

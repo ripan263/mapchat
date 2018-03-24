@@ -3,6 +3,7 @@ package com.example.ripan.map;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -34,6 +35,10 @@ public class Register extends AppCompatActivity {
         email = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
 
+        first.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        sur.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        dateofbirth.setInputType(InputType.TYPE_CLASS_DATETIME);
+        email.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         final Button email_sign_in_button = (Button) findViewById(R.id.email_sign_in_button);
 
         email_sign_in_button.setOnClickListener(new View.OnClickListener() {
