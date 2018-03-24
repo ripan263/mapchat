@@ -35,6 +35,8 @@ public class Message {
         Red,
         Blue,
         Green,
+        Orange,
+        Swords,
         BoxingGlove,
         NyanCat
     }
