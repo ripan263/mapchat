@@ -41,6 +41,13 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:orientation="vertical">
+                <ImageView
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/applogo"
+                    />
 
                 <EditText
                     android:id="@+id/firstname"
@@ -54,7 +61,7 @@
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:singleLine="true"
-                    android:layout_marginTop="60dp"
+                    android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
                     android:nextFocusUp="@id/email"
                     android:nextFocusLeft="@id/email"

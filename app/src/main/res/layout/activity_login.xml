@@ -33,6 +33,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+                <ImageView
+                    android:layout_width="325dp"
+                    android:layout_height="325dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/applogo"
+                    />
                 <AutoCompleteTextView
                         android:id="@+id/email"
                         android:layout_width="325dp"
@@ -43,7 +50,7 @@
                         android:inputType="textEmailAddress"
                         android:maxLines="1"
                         android:singleLine="true"
-                        android:layout_marginTop="250dp"
+                        android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
                         android:textStyle="bold"
                         android:nextFocusUp="@id/email"

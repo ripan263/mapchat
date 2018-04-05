@@ -130,7 +130,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
                                 Message.PinType randomType = Message.PinType.values()[new Random().nextInt(Message.PinType.values().length)];
                                 //Log.e("Map", user_file.getUsername(getApplication().getBaseContext()));
                                 //Message m = new Message(user_file.getUsername(getApplication().getBaseContext()), title, curLocation, new Date(), randomType);
-                                Message m = new Message("Blah", title, curLocation, new Date(), randomType);
+                                Message m = new Message(user_file.getUsername(getContext()), title, curLocation, new Date(), randomType);
 
                                 showMessageOnMap(m);
                                 Messages.postMessage(m);
