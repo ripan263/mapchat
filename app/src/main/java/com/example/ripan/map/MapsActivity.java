@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -56,6 +57,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
+
+import static android.content.ContentValues.TAG;
 
 public class MapsActivity extends Fragment implements OnMapReadyCallback,
         GoogleMap.OnMyLocationButtonClickListener,
@@ -124,7 +127,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
                         public void onSuccess(Location location) {
                             if (location != null) {
 
-                                LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                                LatLng curLocation = new LatLng(location.getLatitude()+(Math.random()-0.5)/5000, location.getLongitude()+(Math.random()-0.5)/5000);
 
                                 // Testing pintype, TODO: Load from ui..
                                 Message.PinType randomType = Message.PinType.values()[new Random().nextInt(Message.PinType.values().length)];
@@ -218,7 +221,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
             public void onSuccess(Location location) {
                 if (location != null) {
                     LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                    mMap.animateCamera(CameraUpdateFactory.newLatLng(curLocation));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curLocation,18));
                 }
             }
         });
@@ -248,7 +251,56 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
 
         // Add listener to messages.
         Messages.addObserver(this);
+        Random rand = new Random();
+        switch(rand.nextInt(3)+1)
+        {
+            case 1:
+                try {
+                    // Customise the styling of the base map using a JSON object defined
+                    // in a raw resource file.
+                    boolean success;
 
+                    success = mMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( this.getActivity(),R.raw.map_style_retro ));
+
+                    if (!success) {
+                        Log.e(TAG, "Style parsing failed.");
+                    }
+                } catch (Resources.NotFoundException e) {
+                    Log.e(TAG, "Can't find style. Error: ", e);
+                }
+                break;
+            case 2:
+                try {
+                    // Customise the styling of the base map using a JSON object defined
+                    // in a raw resource file.
+                    boolean success;
+
+                    success = mMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( this.getActivity(),R.raw.map_style_night ));
+
+                    if (!success) {
+                        Log.e(TAG, "Style parsing failed.");
+                    }
+                } catch (Resources.NotFoundException e) {
+                    Log.e(TAG, "Can't find style. Error: ", e);
+                }
+                break;
+            default:
+                try {
+                    // Customise the styling of the base map using a JSON object defined
+                    // in a raw resource file.
+                    boolean success;
+
+                    success = mMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( this.getActivity(),R.raw.map_style_4 ));
+
+                    if (!success) {
+                        Log.e(TAG, "Style parsing failed.");
+                    }
+                } catch (Resources.NotFoundException e) {
+                    Log.e(TAG, "Can't find style. Error: ", e);
+                }
+                break;
+
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
@@ -265,10 +317,10 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
             //mMap.setOnMyLocationClickListener(this);
         }
         // Set the style of the map..
-        googleMap.setMapStyle(new MapStyleOptions(
+       /* googleMap.setMapStyle(new MapStyleOptions(
                 getResources().getString(R.string.map_style)
         ));
-
+*/
         PanCameraToCurrentLocation();
     }
 
