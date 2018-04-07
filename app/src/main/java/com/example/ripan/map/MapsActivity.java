@@ -41,6 +41,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -57,6 +58,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static android.content.ContentValues.TAG;
 
@@ -127,7 +130,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
                         public void onSuccess(Location location) {
                             if (location != null) {
 
-                                LatLng curLocation = new LatLng(location.getLatitude()+(Math.random()-0.5)/5000, location.getLongitude()+(Math.random()-0.5)/5000);
+                                LatLng curLocation = new LatLng(location.getLatitude() + (Math.random() - 0.5) / 5000, location.getLongitude() + (Math.random() - 0.5) / 5000);
 
                                 // Testing pintype, TODO: Load from ui..
                                 Message.PinType randomType = Message.PinType.values()[new Random().nextInt(Message.PinType.values().length)];
@@ -137,6 +140,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
 
                                 showMessageOnMap(m);
                                 Messages.postMessage(m);
+
+                                Messages.update();
                             }
                         }
                     });
@@ -144,7 +149,15 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
                 }
             }
         });
-        Messages.update();
+
+        int delay = 0; // delay for 0 sec.
+        int period = 100; // repeat every 0.1 sec.
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                Messages.update();
+            }
+        }, delay, period);
 
         return view;
     }
@@ -221,7 +234,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
             public void onSuccess(Location location) {
                 if (location != null) {
                     LatLng curLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curLocation,18));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curLocation, 20));
                 }
             }
         });
@@ -252,15 +265,14 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
         // Add listener to messages.
         Messages.addObserver(this);
         Random rand = new Random();
-        switch(rand.nextInt(3)+1)
-        {
+        switch (rand.nextInt(3) + 1) {
             case 1:
                 try {
                     // Customise the styling of the base map using a JSON object defined
                     // in a raw resource file.
                     boolean success;
 
-                    success = mMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( this.getActivity(),R.raw.map_style_retro ));
+                    success = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this.getActivity(), R.raw.map_style_retro));
 
                     if (!success) {
                         Log.e(TAG, "Style parsing failed.");
@@ -275,7 +287,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
                     // in a raw resource file.
                     boolean success;
 
-                    success = mMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( this.getActivity(),R.raw.map_style_night ));
+                    success = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this.getActivity(), R.raw.map_style_night));
 
                     if (!success) {
                         Log.e(TAG, "Style parsing failed.");
@@ -290,7 +302,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
                     // in a raw resource file.
                     boolean success;
 
-                    success = mMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( this.getActivity(),R.raw.map_style_4 ));
+                    success = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this.getActivity(), R.raw.map_style_4));
 
                     if (!success) {
                         Log.e(TAG, "Style parsing failed.");
@@ -408,9 +420,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
 
         }
         marker = mMap.addMarker(markerOptions);
+        marker.showInfoWindow();
         mMap.setOnMarkerClickListener(this);
-
-        // marker.showInfoWindow();
     }
 
 
@@ -470,8 +481,6 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,
     @Override
     public void onResume() {
         super.onResume();
-       // if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-         //   Log.i("ON RESUME","BC on tah hai");
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER) && !manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             buildAlertMessageNoGps();
         }

@@ -144,10 +144,10 @@
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:background="@drawable/rounded_corner"
-                    android:textColor="@color/textColor"
                     android:layout_marginTop="16dp"
+                    android:background="@drawable/rounded_corner"
                     android:text="Register"
+                    android:textColor="@color/textColor"
                     android:textStyle="bold" />
 
             </LinearLayout>

@@ -30,6 +30,7 @@
             android:hint="Enter your message here"
             android:nextFocusUp="@id/email"
             android:nextFocusLeft="@id/email"
+            android:textColorHint="#a8a8a8"
             android:textSize="24sp" />
 
         <android.support.v7.widget.AppCompatImageView
